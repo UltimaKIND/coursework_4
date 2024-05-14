@@ -43,6 +43,8 @@ class Vacancy:
         if self.schedule:
             self.schedule = self.schedule['name']
 
+        self.params = json.dumps(params, ensure_ascii=False)
+
         #добавляем объект в список на уровне класса
         Vacancy.vacancies.append(self)
 
