@@ -67,7 +67,7 @@ class Vacancy:
         '''
         return f'id:\t\t{self.id}\nname:\t\t{self.name}\ncity:\t\t{self.area}\
                 \nexperience:\t{self.experience}\nsalary:\t\t{self.salary}\
-                \nschedule\t\t{self.schedule}\n'
+                \nschedule\t{self.schedule}\n'
 
     def __dict__(self):
         '''
