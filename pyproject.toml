@@ -1,13 +1,12 @@
 [tool.poetry]
 name = "coursework-4"
 version = "0.1.0"
-description = "курсовая работа backend-developer Skypro"
+description = ""
 authors = ["UltimaKIND <minion9@mail.ru>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.10"
-pytest = "^8.2.0"
 requests = "^2.31.0"
 
 
