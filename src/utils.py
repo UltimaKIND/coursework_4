@@ -1,18 +1,27 @@
 from src.saver import JSONSaver
 from src.parser import HH
 from src.vacancy import Vacancy
-from typing import List
 import os
+
 
 endl = '\n'
 
 def clear_console():
+    '''
+    почисти консоль
+    '''
     os.system('clear')
 
 def class_to_dict(obj):
+    '''
+    функция для сериализации объектов
+    '''
     return obj.__dict__()
 
-def filter_vacancies(vacancies_list, filter_words):
+def filter_vacancies(vacancies_list: list[Vacancy], filter_words: list[str]) -> list[Vacancy]:
+    '''
+    фильтруй вакансии по списку слов
+    '''
     #поиск по строковому представления вакасиии в целом, возможно стоит
     #добавить регулярные выражения.
     filtered_vacancies = []
@@ -26,8 +35,11 @@ def filter_vacancies(vacancies_list, filter_words):
     else:
         return vacancies_list
           
+def get_vacancies_by_salary(vacancies: list[Vacancy], salary_range: str) -> list[Vacancy]:
+    '''
+    фильтруй вакансии по зарплате пример '100000-120000'
+    '''
 
-def get_vacancies_by_salary(vacancies, salary_range):
     filtered_vacancies = []
     if salary_range:
         between = tuple(int(i) for i in (salary_range.split('-')))
@@ -40,17 +52,29 @@ def get_vacancies_by_salary(vacancies, salary_range):
 
     return filtered_vacancies
 
-def sort_vacancies(vacancies):
+def sort_vacancies(vacancies: list[Vacancy]) -> list[Vacancy]:
+    '''
+    отсортируй список вакансий
+    '''
     return sorted(vacancies, key=lambda vacancy: vacancy.salary, reverse=True)
 
-def get_top_vacancies(vacancies, top_n):
+def get_top_vacancies(vacancies: list[Vacancy], top_n: int) -> list[Vacancy]:
+    '''
+    верни топ по заданному числу
+    '''
     return vacancies[:top_n]
 
-def print_vacancies(vacancies):
+def print_vacancies(vacancies: list[Vacancy]):
+    '''
+    распечатай вакансии
+    '''
     for vacancy in vacancies:
         print(f'{vacancy}')
 
 def user_interaction():
+    '''
+    функция для взаимодействия с пользователем
+    '''
     clear_console()
     platforms = ['HeadHunter']
 
@@ -79,23 +103,26 @@ def user_interaction():
             salary_range = input('Введите диапазон зарплат: ') # Пример: 100000-150000
 
             fileworker = 'fileworker'
+            
+            #инициализация объекта работающего с api внешнего ресурса
+            #и вызовы его методов
             hh_api = HH(fileworker)
             hh_vacancies = hh_api.get_vacancies(search_query)
             vacancies_list = Vacancy.cast_to_object_list(hh_vacancies)
 
+            #вызовы функций осуществляющих:
+            #фильтрацию по словам
             filtered_vacancies = filter_vacancies(vacancies_list, filter_words)
-
+            #фильтрацию по зарплате
             ranged_vacancies = get_vacancies_by_salary(filtered_vacancies, salary_range)
-
+            #сортировку по зарплате
             sorted_vacancies = sort_vacancies(ranged_vacancies)
-    
+            #срез по отсортированному списку -> топ
             top_vacancies = get_top_vacancies(sorted_vacancies, top_n)
 
-            #---------------------------------------
-
+            #печать
             print_vacancies(top_vacancies)
 
-            #---------------------------------------
             user_select = input('можем сохранить данные в файл или повторить поиск, продолжаем?\n')
             if 'не' in user_select:
                 clear_console()
@@ -105,7 +132,7 @@ def user_interaction():
                 continue
 
         elif select_mode == 2:
-            #---------------------------------------
+            #сохраняем данные в файл
             try:
                 file_name = input(f'введи имя файла:{endl}') 
                 clear_console()
