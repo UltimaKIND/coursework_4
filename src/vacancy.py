@@ -3,8 +3,6 @@ import requests, json
 class Vacancy:
     #список для хранения экземпляров класса
     vacancies = []
-    #список атрибутов для инициализация
-    options = ['id', 'name', 'experience', 'salary', 'schedule']
     #получение курса валют центробанк
     response = requests.get('https://www.cbr-xml-daily.ru/daily_json.js')
     exchange_rates = json.loads(response.text)['Valute']
@@ -13,11 +11,17 @@ class Vacancy:
 
     def __init__(self, **params):
         #инициализируем атрибуты из списка класса options если таковые есть в params, иначе None 
-        for option in Vacancy.options:
-            if option in params.keys():
-                self.__dict__[option] = params[option]
-            else:
-                self.__dict__[option] = None
+        self.id = params.get('id')
+        self.name = params.get('name') or None
+        self.area = (params.get('area') or None).get('name')
+        self.experience = (params.get('experience') or None).get('name')
+        self.salary = params.get('salary')
+        self.schedule = (params.get('schedule') or None).get('name')
+        #for option in Vacancy.options:
+        #    if option in params.keys():
+        #        self.__dict__[option] = params[option]
+        #    else:
+        #        self.__dict__[option] = None
         #переводим зарплату в рубли, список курсов также на уровне класса
 
         if self.salary:
@@ -37,12 +41,16 @@ class Vacancy:
         else:
             self.salary = self.salary['to']
 
-        if self.experience:
-            self.experience = self.experience['name']
+        #if self.area:
+        #    self.area = self.area['name']
 
-        if self.schedule:
-            self.schedule = self.schedule['name']
+        #if self.experience:
+        #    self.experience = self.experience['name']
 
+        #if self.schedule:
+        #    self.schedule = self.schedule['name']
+
+        #строковое представление того что получили с внешнего ресурса
         self.params = json.dumps(params, ensure_ascii=False)
 
         #добавляем объект в список на уровне класса
@@ -54,23 +62,16 @@ class Vacancy:
 
 
     def __str__(self):
-        return f'id:\t\t{self.id}\nname:\t\t{self.name}\nexperience:\t{self.experience}\
-                \nsalary:\t\t{self.salary}\nshedule\t\t{self.schedule}\n'
+        return f'id:\t\t{self.id}\nname:\t\t{self.name}\ncity:\t\t{self.area}\
+                \nexperience:\t{self.experience}\nsalary:\t\t{self.salary}\
+                \nschedule\t\t{self.schedule}\n'
+
+    def __dict__(self):
+        return{'id': self.id, 'name': self.name, 'city': self.area, 'experience': self.experience, 'salary': self.salary, 'schedule': self.schedule}
 
     def cast_to_object_list(vacancies):
         for vacancy in vacancies:
             Vacancy.new_vacancy(vacancy)
         return Vacancy.vacancies
 
-if __name__ == '__main__':
-    test_1 = {'id':'test1', 'name':'test1', 'experience':'test1', 'salary':None, 'shedule':'test1', 'test_key':'test1'}
-    test_2 = {'id':'test2', 'name':'test2', 'experience':'test2', 'salary':None, 'shedule':'test2', 'test_key':'test2'}
-    test_list = [test_1, test_2]
 
-    vacancies = Vacancy.cast_to_object_list(test_list)
-
-
-    for vacancy in vacancies:
-        print(vacancy)
-
-        
