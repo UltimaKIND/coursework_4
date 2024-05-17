@@ -1,7 +1,7 @@
 from src.saver import JSONSaver
 from src.parser import HH
 from src.vacancy import Vacancy
-import os
+import os, time
 
 
 endl = '\n'
@@ -79,16 +79,13 @@ def user_interaction():
     platforms = ['HeadHunter']
 
     while(True):
-        filepath = ''
         user_select = ''
         print('hello_')
         print('что желаете? можно:')
         print(f"1 - получить данные о вакансиях из {', '.join(platforms)}")
-        if filepath:
-            print(f'2 - получить данные из файла, если указать из какого')
-        else:
-            print(f'2 - сохранить данные в файл: {filepath}')
-        print(f'>= 3 ===> выход')
+        print(f'2 - сохранить данные в файл')
+        print(f'3 - получить данные из файла')
+        print(f'>= 4 ===> выход')
         try:
             select_mode = int(input())
         except ValueError:
@@ -150,6 +147,31 @@ def user_interaction():
             else:
                 clear_console()
                 continue
+        elif select_mode == 3:
+            #читаем данные из файла
+            available_files = os.listdir('data')
+            if available_files:
+                print(f'доступны файлы: {", ".join(available_files)}')
+                selected_file = input('напиши какой ты хочешь: ')
+                if selected_file + '.json' not in available_files:
+                    print('а такого файла нет')
+                    time.sleep(3)
+                    clear_console()
+                else:
+                   file_worker = JSONSaver(selected_file)
+                   file_worker.read_data()
+                user_select = input('хочешь повторить?\n')
+                if 'не' in user_select:
+                    clear_console()
+                    break
+                else:
+                    clear_console()
+                    continue
+            else:
+                print(f'файлов для чтения пока нет')
+                time.sleep(3)
+                clear_console()
+
         else:
             break
             

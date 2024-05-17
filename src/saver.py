@@ -32,26 +32,33 @@ class JSONSaver(Saver):
     '''
     filepath = './data/'
 
-    def __init__(self, f_path, data: list[Vacancy]):
+    def __init__(self, f_path, data: list[Vacancy] = []):
         self.f_path = f'{JSONSaver.filepath}{f_path}.json'
         self.data = data
 
-    def read_data(self, f_path):
-        pass
-
+    def read_data(self):
+        '''
+        чтение данных, для хранения вакансий используется таже структура
+        '''
+        with open(self.f_path, 'r') as f:
+            vacancies = Vacancy.cast_to_object_list(json.loads(f.read()))
+            src.utils.print_vacancies(vacancies)
+            
     def save(self):
+        '''
+        сохранение данных
+        '''
         to_save = []
         for vacancy in self.data:
-            to_save.append(json.dumps(vacancy, default=src.utils.class_to_dict))
+            to_save.append(vacancy.__dict__())
         with open(self.f_path, 'w') as f:
-            f.writelines(to_save)
+            json.dump(to_save, f)
         print('данные успешно записаны')
-
-
 
     def add(self, vacancy: Vacancy):
         pass
 
     def delete(self):
         pass
+
 
