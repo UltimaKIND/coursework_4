@@ -22,7 +22,7 @@ class Vacancy:
         self.schedule = (params.get('schedule') or None).get('name')
 
         #переводим зарплату в рубли
-        if self.salary:
+        if not isinstance(self.salary, int):
             if self.salary['currency'] != 'RUR':
                 currency = Vacancy.exchange_rates[self.salary['currency']]
                 nominal = currency['Nominal']
@@ -33,11 +33,11 @@ class Vacancy:
                 if self.salary['to']:
                     self.salary['to'] = self.salary["to"]*value/nominal
 
-        #если у зарплаты есть поле от (from) инициализируем зарплаты, иначе полем до (to)
-        if self.salary['from']:
-            self.salary = self.salary['from']
-        else:
-            self.salary = self.salary['to']
+            #если у зарплаты есть поле от (from) инициализируем зарплаты, иначе полем до (to)
+            if self.salary['from']:
+                self.salary = self.salary['from']
+            else:
+                self.salary = self.salary['to']
 
         #строковое представление того что получили с внешнего ресурса
         self.params = json.dumps(params, ensure_ascii=False)
@@ -53,10 +53,18 @@ class Vacancy:
         return cls(**params)
 
     @classmethod
+    def clear_vacancies(cls):
+        '''
+        очищаем список вакансий
+        '''
+        cls.vacancies = []
+
+    @classmethod
     def cast_to_object_list(cls, vacancies: list[dict]):
         '''
         инициализация списка вакансий
         '''
+        cls.clear_vacancies() 
         for vacancy in vacancies:
             cls.new_vacancy(vacancy)
         return cls.vacancies
@@ -73,7 +81,9 @@ class Vacancy:
         '''
         метод для сериализации объектов
         '''
-        return{'id': self.id, 'name': self.name, 'city': self.area, 'experience': self.experience, 'salary': self.salary, 'schedule': self.schedule}
+        return{'id': self.id, 'name': self.name, 'area': {'name': self.area},\
+                'experience': {'name': self.experience}, 'salary': self.salary,\
+                'schedule': {'name': self.schedule}}
 
     #методы для реализаций операций сравнения
     def __eq__(self, other):
