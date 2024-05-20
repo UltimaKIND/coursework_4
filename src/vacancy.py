@@ -22,7 +22,7 @@ class Vacancy:
         self.schedule = (params.get('schedule') or None).get('name')
 
         #переводим зарплату в рубли
-        if not isinstance(self.salary, int):
+        if isinstance(self.salary, dict):
             if self.salary['currency'] != 'RUR':
                 currency = Vacancy.exchange_rates[self.salary['currency']]
                 nominal = currency['Nominal']
